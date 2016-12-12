@@ -1,0 +1,288 @@
+JFDML JFormDesigner: "5.2.5.1.342" Java: "1.8.0_112-release" encoding: "UTF-8"
+
+new FormModel {
+	contentType: "form/swing"
+	root: new FormRoot {
+		add( new FormWindow( "javax.swing.JFrame", new FormLayoutManager( class javax.swing.BoxLayout ) {
+			"axis": 1
+		} ) {
+			name: "this"
+			"defaultCloseOperation": 3
+			"title": "Exercise Timer"
+			"cursor": new java.awt.Cursor( 0 )
+			"resizable": false
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+				"$horizontalGroup": "par l {seq {space :::p, par l {seq {par l:::p {comp jButtonStartStop::l:::x, comp jPanelPreset::l::229:x}, space :0:0:x}, seq l {comp jTextFieldMinutes:::p:96:p, space ::7:x, comp jLabelColon:::p::p, space :::p, comp jTextFieldSeconds:::p:96:p}}, space :::p}}"
+				"$verticalGroup": "par l {seq l {par b {comp jTextFieldMinutes::b:p:93:p, comp jTextFieldSeconds::b:p::p, comp jLabelColon::b:p::p}, space :p:12:p, comp jButtonStartStop:::p::p, space u:::p, comp jPanelPreset:::p::p}}"
+			} ) {
+				name: "jPanelTimer"
+				"border": new javax.swing.border.TitledBorder( "Timer" )
+				"nextFocusableComponent": new FormReference( "jButtonStartStop" )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "jButtonStartStop"
+					"font": new java.awt.Font( "Tahoma", 0, 16 )
+					"text": "START"
+					"toolTipText": "Zapne nebo zastaví odpočítávání časomíry"
+					"nextFocusableComponent": new FormReference( "jRadioButton1min" )
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "jButtonStartStopClicked", true ) )
+				} )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "jTextFieldMinutes"
+					"editable": false
+					"font": new java.awt.Font( "Tahoma", 0, 72 )
+					"horizontalAlignment": 0
+					"text": "01"
+					"toolTipText": "Minuty"
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "jLabelColon"
+					"font": new java.awt.Font( "Tahoma", 0, 72 )
+					"text": ":"
+				} )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "jTextFieldSeconds"
+					"editable": false
+					"font": new java.awt.Font( "Tahoma", 0, 72 )
+					"horizontalAlignment": 0
+					"text": "00"
+					"toolTipText": "Vteřiny"
+				} )
+				add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+					"$horizontalGroup": "par l {seq {par l {comp jLabelPresetTitle:::p::p, seq l {space :10:10:p, par l {comp jRadioButton1min:::p::p, comp jRadioButton2min::l:p::p, comp jRadioButton3min::l:p::p}, space :::p, par l {comp jRadioButton5min::l:p::p, comp jRadioButton10min::l:p::p, seq {comp jRadioButtonXmin:::p::p, space :::p, comp jTextFieldXmin:::p:34:p, space :::p, comp jLabelXmin:::p::p}}}}, space :::x, comp jButtonResetTimer:::p::p, space :::p}}"
+					"$verticalGroup": "par l {seq l {par l {seq {comp jLabelPresetTitle:::p::p, space u:::p, par b {comp jRadioButton1min::b:p::p, comp jRadioButton5min::b:p::p}}, seq l {space :::p, comp jButtonResetTimer:::p::p}}, space :::p, par b {comp jRadioButton2min::b:p::p, comp jRadioButton10min::b:p::p}, space :::p, par l {comp jRadioButton3min:::p::p, par b:l {comp jTextFieldXmin::b:p::p, comp jLabelXmin::b:p::p}, comp jRadioButtonXmin:::p::p}, space ::12:x}}"
+				} ) {
+					name: "jPanelPreset"
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "jLabelPresetTitle"
+						"font": new java.awt.Font( "Tahoma", 1, 11 )
+						"text": "Time preset:"
+					} )
+					add( new FormComponent( "javax.swing.JRadioButton" ) {
+						name: "jRadioButton1min"
+						"selected": true
+						"text": "1 minute"
+						"actionCommand": "1  minuta"
+						"$buttonGroup": new FormReference( "buttonGroup1" )
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "jRadioButton1ActionPerformed", true ) )
+					} )
+					add( new FormComponent( "javax.swing.JRadioButton" ) {
+						name: "jRadioButton2min"
+						"text": "2 minutes"
+						"$buttonGroup": new FormReference( "buttonGroup1" )
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "jRadioButton2ActionPerformed", true ) )
+					} )
+					add( new FormComponent( "javax.swing.JRadioButton" ) {
+						name: "jRadioButton3min"
+						"text": "3 minutes"
+						"$buttonGroup": new FormReference( "buttonGroup1" )
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "jRadioButton3ActionPerformed", true ) )
+					} )
+					add( new FormComponent( "javax.swing.JRadioButton" ) {
+						name: "jRadioButton5min"
+						"text": "5 minutes"
+						"$buttonGroup": new FormReference( "buttonGroup1" )
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "jRadioButton4ActionPerformed", true ) )
+					} )
+					add( new FormComponent( "javax.swing.JRadioButton" ) {
+						name: "jRadioButton10min"
+						"text": "10 minutes"
+						"$buttonGroup": new FormReference( "buttonGroup1" )
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "jRadioButton5ActionPerformed", true ) )
+					} )
+					add( new FormComponent( "javax.swing.JRadioButton" ) {
+						name: "jRadioButtonXmin"
+						"$buttonGroup": new FormReference( "buttonGroup1" )
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "jRadioButton6ActionPerformed", true ) )
+					} )
+					add( new FormComponent( "javax.swing.JTextField" ) {
+						name: "jTextFieldXmin"
+						"editable": false
+						addEvent( new FormEvent( "java.awt.event.KeyListener", "keyReleased", "jTextFieldPocetMinutKeyReleased", true ) )
+					} )
+					add( new FormComponent( "javax.swing.JLabel" ) {
+						name: "jLabelXmin"
+						"text": "min"
+					} )
+					add( new FormComponent( "javax.swing.JButton" ) {
+						name: "jButtonResetTimer"
+						"text": "Reset"
+						"enabled": false
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "jTlacResetCasomiryActionPerformed", true ) )
+					} )
+				} )
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+				"$horizontalGroup": "par l {seq {space :::p, par l {seq {comp jTextFieldSeries:::p:34:p, space :::p, comp jLabelSeries:::p::p, space ::16:x, comp jButtonSetSeries:::p:63:p, space :::p, comp jButtonResetSeries:::p::p}, seq l {comp jLabelSeriesCounterMode:::p::p, space :0:110:x}}, space :::p}}"
+				"$verticalGroup": "par l {seq l {space :::p, par b {comp jButtonSetSeries::b:p::p, comp jButtonResetSeries::b:p::p, par b:b {comp jTextFieldSeries::b::29:x, comp jLabelSeries::b:p::p}}, space :::p, comp jLabelSeriesCounterMode:::p::p, space :::p}}"
+			} ) {
+				name: "jPanelSeries"
+				"border": new javax.swing.border.TitledBorder( "Series counter:" )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "jTextFieldSeries"
+					"editable": false
+					"font": new java.awt.Font( "Tahoma", 0, 18 )
+					"horizontalAlignment": 0
+					"text": "0"
+					"toolTipText": "Počet odcvičených sérií"
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "jLabelSeries"
+					"font": new java.awt.Font( "Tahoma", 0, 18 )
+					"text": "series"
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "jButtonSetSeries"
+					"text": "Set"
+					"toolTipText": "Nejprve je nutné nastavit režim odpočítávání."
+					"enabled": false
+					"margin": new java.awt.Insets( 2, 5, 2, 5 )
+					"preferredSize": new java.awt.Dimension( 63, 23 )
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "jTlacNastavSerieActionPerformed", true ) )
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "jButtonResetSeries"
+					"text": "Reset"
+					"margin": sfield com.jformdesigner.model.FormObject NULL_VALUE
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "jTlacResetSerii1ActionPerformed", true ) )
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "jLabelSeriesCounterMode"
+					"font": &Font0 new java.awt.Font( "Tahoma", 0, 10 )
+					"text": "Mode: ascendant counting"
+					"enabled": false
+				} )
+			} )
+			add( new FormContainer( "javax.swing.JPanel", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+				"$horizontalGroup": "par l {seq {space :::p, par l {seq l {comp jLabelGlobalTime:::p::p, space :::p, comp jLabelGlobalTimeState:::p::p, space :0:0:x}, seq l {comp jTextFieldGlobalTime:::p:43:p, space :::p, comp jLabelHours:::p::p, space :::x, comp jButtonPauseGlobalTime:::p::p, space :::p, comp jButtonResetGlobalTime:::p::p}}, space :::p}}"
+				"$verticalGroup": "par l {seq {space :::x, par b {comp jTextFieldGlobalTime::b:p::p, comp jLabelHours::b:p::p, comp jButtonPauseGlobalTime::b:p::p, comp jButtonResetGlobalTime::b:p::p}, par l {comp jLabelGlobalTimeState:::p::p, comp jLabelGlobalTime::l:p::p}}}"
+			} ) {
+				name: "jPanelGlobalTime"
+				"border": new javax.swing.border.TitledBorder( "Exercise time:" )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "jLabelHours"
+					"text": "hours"
+				} )
+				add( new FormComponent( "javax.swing.JTextField" ) {
+					name: "jTextFieldGlobalTime"
+					"editable": false
+					"horizontalAlignment": 0
+					"text": "00:00"
+					"preferredSize": new java.awt.Dimension( 63, 21 )
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "jLabelGlobalTime"
+					"font": #Font0
+					"text": "Hodiny:"
+					"enabled": false
+				} )
+				add( new FormComponent( "javax.swing.JLabel" ) {
+					name: "jLabelGlobalTimeState"
+					"font": new java.awt.Font( "Tahoma", 0, 10 )
+					"text": "neběží"
+					"enabled": false
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "jButtonResetGlobalTime"
+					"text": "Reset"
+					addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "jButton1ActionPerformed", true ) )
+				} )
+				add( new FormComponent( "javax.swing.JButton" ) {
+					name: "jButtonPauseGlobalTime"
+					"text": "Pause"
+				} )
+			} )
+			menuBar: new FormContainer( "javax.swing.JMenuBar", new FormLayoutManager( class javax.swing.JMenuBar ) ) {
+				name: "jMenuBar1"
+				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
+					name: "jMenu1"
+					"mnemonic": 83
+					"text": "File"
+					"toolTipText": ""
+					add( new FormComponent( "javax.swing.JMenuItem" ) {
+						name: "jMenuItem3"
+						"mnemonic": 78
+						"text": "Preferences"
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "jMenuItem3ActionPerformed", true ) )
+					} )
+					add( new FormComponent( "javax.swing.JPopupMenu$Separator" ) {
+						name: "jSeparator1"
+					} )
+					add( new FormComponent( "javax.swing.JMenuItem" ) {
+						name: "jMenuItem1"
+						"mnemonic": 85
+						"text": "Quit"
+						addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "jMenuItem1ActionPerformed", true ) )
+					} )
+				} )
+				add( new FormContainer( "javax.swing.JMenu", new FormLayoutManager( class javax.swing.JMenu ) ) {
+					name: "jMenu3"
+					"mnemonic": 78
+					"text": "Help"
+					add( new FormComponent( "javax.swing.JMenuItem" ) {
+						name: "jMenuItem2"
+						"mnemonic": 79
+						"text": "About"
+					} )
+				} )
+			}
+		}, new FormLayoutConstraints( null ) {
+			"size": new java.awt.Dimension( 270, 500 )
+			"location": new java.awt.Point( 50, 50 )
+		} )
+		add( new FormContainer( "javax.swing.JFrame", new FormLayoutManager( class org.jdesktop.layout.GroupLayout ) {
+			"$horizontalGroup": "par l {seq {space :::p, par l {comp jLabelPreferencesHeading::l:p::p, comp jLabelPreferencesDesc::l:p::p, seq {comp jRadioButtonAsc:::p::p, par l {seq l {space ::63:x, comp jButtonSavePreferences:::p:65:p, space :::p, comp jButtonStornoPreferences:::p::p}, seq {space :20:20:p, comp jRadioButtonDesc:::p::p}}}}, space :p::p}}"
+			"$verticalGroup": "par l {seq {space :::p, comp jLabelPreferencesHeading:::p::p, space :1:1:p, comp jLabelPreferencesDesc:::p::p, par l {seq {space :::p, par l {comp jRadioButtonAsc:::p::p, comp jRadioButtonDesc:::p::p}, space :::x}, seq t {space ::37:x, par b {comp jButtonStornoPreferences::b:p::p, comp jButtonSavePreferences::b:p::p}, space :::p}}}}"
+		} ) {
+			name: "jFramePreferences"
+			"title": "Preferences"
+			"alwaysOnTop": true
+			"bounds": new java.awt.Rectangle( 100, 100, 0, 0 )
+			"locationByPlatform": true
+			"minimumSize": new java.awt.Dimension( 300, 140 )
+			"resizable": false
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "jLabelPreferencesDesc"
+				"text": "Chose ascending or descending series counter mode."
+			} )
+			add( new FormComponent( "javax.swing.JRadioButton" ) {
+				name: "jRadioButtonAsc"
+				"selected": true
+				"text": "ascending"
+				"$buttonGroup": new FormReference( "buttonGroup2" )
+			} )
+			add( new FormComponent( "javax.swing.JRadioButton" ) {
+				name: "jRadioButtonDesc"
+				"text": "descending"
+				"$buttonGroup": new FormReference( "buttonGroup2" )
+			} )
+			add( new FormComponent( "javax.swing.JLabel" ) {
+				name: "jLabelPreferencesHeading"
+				"font": new java.awt.Font( "Tahoma", 1, 11 )
+				"text": "Series counter mode:"
+			} )
+			add( new FormComponent( "javax.swing.JButton" ) {
+				name: "jButtonSavePreferences"
+				"text": "Save"
+				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "jTlacUlozNastaveniActionPerformed", true ) )
+			} )
+			add( new FormComponent( "javax.swing.JButton" ) {
+				name: "jButtonStornoPreferences"
+				"text": "Storno"
+				addEvent( new FormEvent( "java.awt.event.ActionListener", "actionPerformed", "jTlacZavriNastaveniActionPerformed", true ) )
+			} )
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 335, 50 )
+			"size": new java.awt.Dimension( 300, 140 )
+		} )
+		add( new FormNonVisual( "javax.swing.ButtonGroup" ) {
+			name: "buttonGroup1"
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 335, 210 )
+		} )
+		add( new FormNonVisual( "javax.swing.ButtonGroup" ) {
+			name: "buttonGroup2"
+		}, new FormLayoutConstraints( null ) {
+			"location": new java.awt.Point( 435, 210 )
+		} )
+	}
+}
