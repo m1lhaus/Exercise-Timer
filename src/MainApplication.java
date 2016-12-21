@@ -1,9 +1,12 @@
+import javax.sound.sampled.*;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,17 +31,13 @@ public class MainApplication extends JFrame {
         }
     }
 
-    private WawPlayer wawPlayer;        // waw audio file player
     private Timer exTimer;              // timer for exercise time measurement
 
-    private final boolean CASOMIRA_BEZI = false;
-    private final boolean CASOMIRA_NEBEZI = true;
+    private final int DELAY = 10;
 
     private int defaultExMinutes = 1;                   // default value number of minutes on timer
     private int defaultExSeconds = 0;                   // default number of seconds on timer
-
-//    static int pocSerii = 0;
-
+    private int defaultNumSeries = 0;
     private CounterMode seriesCounterMode = CounterMode.ASCENDANT;
 
     /**
@@ -47,10 +46,7 @@ public class MainApplication extends JFrame {
     private MainApplication() {
         initComponents();
         this.setLocationRelativeTo(null);
-
-        wawPlayer = new WawPlayer();      // waw audio file player
-        exTimer = new Timer(1000, exTimerTickTock);        // timer for exercise time measurement
-
+        exTimer = new Timer(DELAY, exTimerTickTock);        // timer for exercise time measurement
     }
 
     /**
@@ -60,13 +56,14 @@ public class MainApplication extends JFrame {
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    // Generated using JFormDesigner Evaluation license - Milan Herbig
     private void initComponents() {
         jMenuBar1 = new JMenuBar();
-        jMenu1 = new JMenu();
-        jMenuItem3 = new JMenuItem();
-        jMenuItem1 = new JMenuItem();
-        jMenu3 = new JMenu();
-        jMenuItem2 = new JMenuItem();
+        jMenuFile = new JMenu();
+        jMenuItemPreferences = new JMenuItem();
+        jMenuItemQuit = new JMenuItem();
+        jMenuHelp = new JMenu();
+        jMenuItemAbout = new JMenuItem();
         jPanelTimer = new JPanel();
         jButtonStartStop = new JButton();
         jTextFieldMinutes = new JTextField();
@@ -115,38 +112,38 @@ public class MainApplication extends JFrame {
         //======== jMenuBar1 ========
         {
 
-            //======== jMenu1 ========
+            //======== jMenuFile ========
             {
-                jMenu1.setMnemonic('S');
-                jMenu1.setText("File");
-                jMenu1.setToolTipText("");
+                jMenuFile.setMnemonic('S');
+                jMenuFile.setText("File");
+                jMenuFile.setToolTipText("");
 
-                //---- jMenuItem3 ----
-                jMenuItem3.setMnemonic('N');
-                jMenuItem3.setText("Preferences");
-                jMenuItem3.addActionListener(e -> jMenuItem3ActionPerformed(e));
-                jMenu1.add(jMenuItem3);
-                jMenu1.addSeparator();
+                //---- jMenuItemPreferences ----
+                jMenuItemPreferences.setMnemonic('N');
+                jMenuItemPreferences.setText("Preferences");
+                jMenuItemPreferences.addActionListener(e -> jMenuItemPreferencesActionPerformed(e));
+                jMenuFile.add(jMenuItemPreferences);
+                jMenuFile.addSeparator();
 
-                //---- jMenuItem1 ----
-                jMenuItem1.setMnemonic('U');
-                jMenuItem1.setText("Quit");
-                jMenuItem1.addActionListener(e -> jMenuItem1ActionPerformed(e));
-                jMenu1.add(jMenuItem1);
+                //---- jMenuItemQuit ----
+                jMenuItemQuit.setMnemonic('U');
+                jMenuItemQuit.setText("Quit");
+                jMenuItemQuit.addActionListener(e -> jMenuItemQuitActionPerformed(e));
+                jMenuFile.add(jMenuItemQuit);
             }
-            jMenuBar1.add(jMenu1);
+            jMenuBar1.add(jMenuFile);
 
-            //======== jMenu3 ========
+            //======== jMenuHelp ========
             {
-                jMenu3.setMnemonic('N');
-                jMenu3.setText("Help");
+                jMenuHelp.setMnemonic('N');
+                jMenuHelp.setText("Help");
 
-                //---- jMenuItem2 ----
-                jMenuItem2.setMnemonic('O');
-                jMenuItem2.setText("About");
-                jMenu3.add(jMenuItem2);
+                //---- jMenuItemAbout ----
+                jMenuItemAbout.setMnemonic('O');
+                jMenuItemAbout.setText("About");
+                jMenuHelp.add(jMenuItemAbout);
             }
-            jMenuBar1.add(jMenu3);
+            jMenuBar1.add(jMenuHelp);
         }
         setJMenuBar(jMenuBar1);
 
@@ -191,33 +188,33 @@ public class MainApplication extends JFrame {
                 jRadioButton1min.setSelected(true);
                 jRadioButton1min.setText("1 minute");
                 jRadioButton1min.setActionCommand("1  minuta");
-                jRadioButton1min.addActionListener(e -> jRadioButton1ActionPerformed(e));
+                jRadioButton1min.addActionListener(e -> jRadioButton1minActionPerformed(e));
 
                 //---- jRadioButton2min ----
                 jRadioButton2min.setText("2 minutes");
-                jRadioButton2min.addActionListener(e -> jRadioButton2ActionPerformed(e));
+                jRadioButton2min.addActionListener(e -> jRadioButton2minActionPerformed(e));
 
                 //---- jRadioButton3min ----
                 jRadioButton3min.setText("3 minutes");
-                jRadioButton3min.addActionListener(e -> jRadioButton3ActionPerformed(e));
+                jRadioButton3min.addActionListener(e -> jRadioButton3minActionPerformed(e));
 
                 //---- jRadioButton5min ----
                 jRadioButton5min.setText("5 minutes");
-                jRadioButton5min.addActionListener(e -> jRadioButton4ActionPerformed(e));
+                jRadioButton5min.addActionListener(e -> jRadioButton5minActionPerformed(e));
 
                 //---- jRadioButton10min ----
                 jRadioButton10min.setText("10 minutes");
-                jRadioButton10min.addActionListener(e -> jRadioButton5ActionPerformed(e));
+                jRadioButton10min.addActionListener(e -> jRadioButton10minActionPerformed(e));
 
                 //---- jRadioButtonXmin ----
-                jRadioButtonXmin.addActionListener(e -> jRadioButton6ActionPerformed(e));
+                jRadioButtonXmin.addActionListener(e -> jRadioButtonXminActionPerformed(e));
 
                 //---- jTextFieldXmin ----
                 jTextFieldXmin.setEditable(false);
                 jTextFieldXmin.addKeyListener(new KeyAdapter() {
                     @Override
                     public void keyReleased(KeyEvent e) {
-                        jTextFieldPocetMinutKeyReleased(e);
+                        jTextFieldXminKeyReleased(e);
                     }
                 });
 
@@ -227,7 +224,7 @@ public class MainApplication extends JFrame {
                 //---- jButtonResetTimer ----
                 jButtonResetTimer.setText("Reset");
                 jButtonResetTimer.setEnabled(false);
-                jButtonResetTimer.addActionListener(e -> jTlacResetCasomiryActionPerformed(e));
+                jButtonResetTimer.addActionListener(e -> jButtonResetTimerActionPerformed(e));
 
                 GroupLayout jPanelPresetLayout = new GroupLayout(jPanelPreset);
                 jPanelPreset.setLayout(jPanelPresetLayout);
@@ -340,12 +337,12 @@ public class MainApplication extends JFrame {
             jButtonSetSeries.setEnabled(false);
             jButtonSetSeries.setMargin(new Insets(2, 5, 2, 5));
             jButtonSetSeries.setPreferredSize(new Dimension(63, 23));
-            jButtonSetSeries.addActionListener(e -> jTlacNastavSerieActionPerformed(e));
+            jButtonSetSeries.addActionListener(e -> jButtonSetSeriesActionPerformed(e));
 
             //---- jButtonResetSeries ----
             jButtonResetSeries.setText("Reset");
             jButtonResetSeries.setMargin(null);
-            jButtonResetSeries.addActionListener(e -> jTlacResetSerii1ActionPerformed(e));
+            jButtonResetSeries.addActionListener(e -> jButtonResetSeriesActionPerformed(e));
 
             //---- jLabelSeriesCounterMode ----
             jLabelSeriesCounterMode.setFont(new Font("Tahoma", Font.PLAIN, 10));
@@ -404,17 +401,16 @@ public class MainApplication extends JFrame {
 
             //---- jLabelGlobalTime ----
             jLabelGlobalTime.setFont(new Font("Tahoma", Font.PLAIN, 10));
-            jLabelGlobalTime.setText("Hodiny:");
+            jLabelGlobalTime.setText("Clock:");
             jLabelGlobalTime.setEnabled(false);
 
             //---- jLabelGlobalTimeState ----
             jLabelGlobalTimeState.setFont(new Font("Tahoma", Font.PLAIN, 10));
-            jLabelGlobalTimeState.setText("neb\u011b\u017e\u00ed");
+            jLabelGlobalTimeState.setText("not running");
             jLabelGlobalTimeState.setEnabled(false);
 
             //---- jButtonResetGlobalTime ----
             jButtonResetGlobalTime.setText("Reset");
-            jButtonResetGlobalTime.addActionListener(e -> jButton1ActionPerformed(e));
 
             //---- jButtonPauseGlobalTime ----
             jButtonPauseGlobalTime.setText("Pause");
@@ -485,11 +481,11 @@ public class MainApplication extends JFrame {
 
             //---- jButtonSavePreferences ----
             jButtonSavePreferences.setText("Save");
-            jButtonSavePreferences.addActionListener(e -> jTlacUlozNastaveniActionPerformed(e));
+            jButtonSavePreferences.addActionListener(e -> jButtonSavePreferencesActionPerformed(e));
 
             //---- jButtonStornoPreferences ----
             jButtonStornoPreferences.setText("Storno");
-            jButtonStornoPreferences.addActionListener(e -> jTlacZavriNastaveniActionPerformed(e));
+            jButtonStornoPreferences.addActionListener(e -> jButtonStornoPreferencesActionPerformed(e));
 
             GroupLayout jFramePreferencesContentPaneLayout = new GroupLayout(jFramePreferencesContentPane);
             jFramePreferencesContentPane.setLayout(jFramePreferencesContentPaneLayout);
@@ -571,18 +567,6 @@ public class MainApplication extends JFrame {
         }
     };
 
-
-//    /**
-//     * Slouzi pro jednvterinove zpozdeni napisu "pocitadlo serii"
-//     */
-//    ActionListener zpozdeniCasu = new ActionListener() {
-//        @Override
-//        public void actionPerformed(ActionEvent evt) {
-//            jLabelSeriesCounterMode.setText("odpočítání sérií");
-//        }
-//    };
-
-
     /**
      * Called when exercise time is 00:00
      * Stops exTimer, adjusts GUI, resets timer and plays sound.
@@ -590,7 +574,7 @@ public class MainApplication extends JFrame {
     private void exerciseTimeRanOut() {
         exTimer.stop();
         adjustGUI(true);
-        WawPlayer.playSound("alarm2.wav");
+        playSound("alarm2.wav");
         resetExerciseTime();
 
         // increase or decrease series counter
@@ -668,12 +652,12 @@ public class MainApplication extends JFrame {
         jLabelXmin.setEnabled(timerIsStopped);
     }
 
-    private void startExerciseTimer(){
+    private void startExerciseTimer() {
         exTimer.start();
         adjustGUI(!exTimer.isRunning());
     }
 
-    private void stopExerciseTimer(){
+    private void stopExerciseTimer() {
         exTimer.stop();
         adjustGUI(!exTimer.isRunning());
     }
@@ -682,6 +666,7 @@ public class MainApplication extends JFrame {
         // set selected mode
         if (jRadioButtonAsc.isSelected()) {
             seriesCounterMode = CounterMode.ASCENDANT;
+            defaultNumSeries = 0;
         } else {
             seriesCounterMode = CounterMode.DESCENDANT;
         }
@@ -700,12 +685,26 @@ public class MainApplication extends JFrame {
     }
 
 
+    /**
+     * Play alarm sound after exercise timer time runs-off
+     *
+     * @param filename name of sound file
+     */
+    private void playSound(String filename) {
+        try {
+            File soundFile = new File("." + File.separator + "data" + File.separator + filename);
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
+            Clip clip = AudioSystem.getClip();
+            clip.open(audioIn);
+            clip.start();
+        } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
+            System.out.println("Error when playing media file!");
+        }
+    }
+
 /* ********************* event handlers ******************************** */
 
 
-    /**
-     * START/STOP button clicked slot
-     */
     private void jButtonStartStopClicked(java.awt.event.ActionEvent evt) {
         if ((exTimer == null) || (!exTimer.isRunning())) {
             startExerciseTimer();
@@ -714,158 +713,134 @@ public class MainApplication extends JFrame {
         }
     }
 
-    /**
-     * 1 minute radio button clicked
-     */
-    private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
+    private void jRadioButton1minActionPerformed(java.awt.event.ActionEvent evt) {
         defaultExMinutes = 1;
         setExerciseTime(defaultExMinutes, defaultExSeconds);
         jTextFieldXmin.setEditable(false);
-    }//GEN-LAST:event_jRadioButton1ActionPerformed
+    }
 
-    /**
-     * 2 minuty
-     */
-    private void jRadioButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton2ActionPerformed
+    private void jRadioButton2minActionPerformed(java.awt.event.ActionEvent evt) {
         defaultExMinutes = 2;
         setExerciseTime(defaultExMinutes, defaultExSeconds);
         jTextFieldXmin.setEditable(false);
-    }//GEN-LAST:event_jRadioButton2ActionPerformed
+    }
 
-    /**
-     * 3 minuty
-     */
-    private void jRadioButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton3ActionPerformed
+    private void jRadioButton3minActionPerformed(java.awt.event.ActionEvent evt) {
         defaultExMinutes = 3;
         setExerciseTime(defaultExMinutes, defaultExSeconds);
         jTextFieldXmin.setEditable(false);
-    }//GEN-LAST:event_jRadioButton3ActionPerformed
+    }
 
-    /**
-     * 5 minut
-     */
-    private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
+    private void jRadioButton5minActionPerformed(java.awt.event.ActionEvent evt) {
         defaultExMinutes = 5;
         setExerciseTime(defaultExMinutes, defaultExSeconds);
         jTextFieldXmin.setEditable(false);
-    }//GEN-LAST:event_jRadioButton4ActionPerformed
+    }
 
-    /**
-     * 10 minut
-     */
-    private void jRadioButton5ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton5ActionPerformed
+    private void jRadioButton10minActionPerformed(java.awt.event.ActionEvent evt) {
         defaultExMinutes = 10;
         setExerciseTime(defaultExMinutes, defaultExSeconds);
         jTextFieldXmin.setEditable(false);
-    }//GEN-LAST:event_jRadioButton5ActionPerformed
+    }
 
-    /**
-     * ?? minut
-     */
-    private void jRadioButton6ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton6ActionPerformed
+    private void jRadioButtonXminActionPerformed(java.awt.event.ActionEvent evt) {
         jTextFieldXmin.setEditable(true);
-    }//GEN-LAST:event_jRadioButton6ActionPerformed
+    }
 
     /**
-     * ?? minut
+     * Custom exercise time field filled
      */
-    private void jTextFieldPocetMinutKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTextFieldPocetMinutKeyReleased
-        // pokud byl zadán nějaký znak
+    private void jTextFieldXminKeyReleased(java.awt.event.KeyEvent evt) {
+        // if some character is filled
         if (!(jTextFieldXmin.getText().equals(""))) {
-            // zkusí zadané znaky naparsovat na číslo
+            // parse number
             try {
                 defaultExMinutes = Integer.parseInt(jTextFieldXmin.getText());
             } catch (NumberFormatException e) {
-                System.out.println("Chyba. Musí být zadáno číslo");
                 jTextFieldXmin.setText("");
-                return; // vyskoci z metody, pokud skonci chybou
+                return;
             }
-            // cislo nesmi byt vetsi nez 2 des mista
+            // check bounds
             if (defaultExMinutes > 99) {
-                System.out.println("Chyba. Bylo zadáno moc veliké číslo");
                 jTextFieldXmin.setText("0");
                 defaultExMinutes = 0;
             }
-            // nastaveni casu
             setExerciseTime(defaultExMinutes, defaultExSeconds);
-
         }
-    }//GEN-LAST:event_jTextFieldPocetMinutKeyReleased
+    }
 
     /**
-     * Tlačítko RESET u casomiry
+     * Timer reset button
      */
-    private void jTlacResetCasomiryActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTlacResetCasomiryActionPerformed
-        resetExerciseTime();    // provede reset casomiry
-    }//GEN-LAST:event_jTlacResetCasomiryActionPerformed
+    private void jButtonResetTimerActionPerformed(java.awt.event.ActionEvent evt) {
+        resetExerciseTime();
+    }
 
-    /* Konec programu */
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    /**
+     * Quit the program
+     */
+    private void jMenuItemQuitActionPerformed(java.awt.event.ActionEvent evt) {
         System.exit(0);
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }
 
-    /* Otevreni nastaveni casomiry */
-    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+    /**
+     * Open Preferences dialog
+     */
+    private void jMenuItemPreferencesActionPerformed(java.awt.event.ActionEvent evt) {
         jFramePreferences.setVisible(true);
         jFramePreferences.setLocationRelativeTo(null);
-    }//GEN-LAST:event_jMenuItem3ActionPerformed
+    }
 
-    /* Zavri nastaveni */
-    private void jTlacZavriNastaveniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTlacZavriNastaveniActionPerformed
-        jFramePreferences.dispose();      // "zniceni" okna
-    }//GEN-LAST:event_jTlacZavriNastaveniActionPerformed
+    /**
+     * Storno changes and close Preferences dialog window.
+     */
+    private void jButtonStornoPreferencesActionPerformed(java.awt.event.ActionEvent evt) {
+        jFramePreferences.dispose();
+    }
 
-    /* Ulozeni nastaveni casomiry */
-    private void jTlacUlozNastaveniActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTlacUlozNastaveniActionPerformed
+    /**
+     * Save changes and close Preferences dialog window.
+     */
+    private void jButtonSavePreferencesActionPerformed(java.awt.event.ActionEvent evt) {
         saveSettings();
-    }//GEN-LAST:event_jTlacUlozNastaveniActionPerformed
+    }
 
-    /* Tlacitko nastav pocet serii */
-    private void jTlacNastavSerieActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTlacNastavSerieActionPerformed
-
+    /**
+     * Set user-given number of series.
+     */
+    private void jButtonSetSeriesActionPerformed(java.awt.event.ActionEvent evt) {
+        int newValue;
         try {
-            int tmp = Integer.parseInt(jTextFieldSeries.getText());
-            if (tmp <= 0)
+            newValue = Integer.parseInt(jTextFieldSeries.getText());
+            if (newValue <= 0)
                 throw new NumberFormatException();
-//            else
-//                pocSerii = tmp;
 
         } catch (NumberFormatException e) {
-            final String textTlacitka = jLabelSeriesCounterMode.getText();
-            jLabelSeriesCounterMode.setText("Musí byt nastaveno kladné celé číslo!");
+            final String originalTest = jLabelSeriesCounterMode.getText();
+            jLabelSeriesCounterMode.setText("Desired number must be greater than zero!");
             jButtonStartStop.setEnabled(false);
-            // zobrazeni informace o chybne zadanem cisle
-            new Thread(new Runnable() {
 
-                @Override
-                public void run() {
-                    try {
-                        Thread.sleep(1500);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(MainApplication.class.getName()).log(Level.SEVERE, null, ex);
-                    }
-//                    jLabelSeriesCounterMode.setText(textTlacitka);
-
+            // show info message about wrong input number to user
+            new Thread(() -> {
+                try {
+                    Thread.sleep(3000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(MainApplication.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                jLabelSeriesCounterMode.setText(originalTest);
+
             }).start();
-            //jTextFieldSeries.setText("0");
-//            setNumberOfSeries(pocSerii);
-            return;     // vyskoci ven z metody
+            jTextFieldSeries.setText("0");
+            return;
         }
-        // nastavi pocet serii
-//        setNumberOfSeries(pocSerii);
-        jLabelSeriesCounterMode.setText("Nastaven odpočítávání sérií (nastaveno " + jTextFieldSeries.getText() + ").");
+        setNumberOfSeries(newValue);
+        defaultNumSeries = newValue;
         jButtonStartStop.setEnabled(true);
-    }//GEN-LAST:event_jTlacNastavSerieActionPerformed
+    }
 
-    private void jTlacResetSerii1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTlacResetSerii1ActionPerformed
-        setNumberOfSeries(0);
-    }//GEN-LAST:event_jTlacResetSerii1ActionPerformed
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
-
+    private void jButtonResetSeriesActionPerformed(java.awt.event.ActionEvent evt) {
+        setNumberOfSeries(defaultNumSeries);
+    }
 
     /**
      * @param args the command line arguments
@@ -905,12 +880,13 @@ public class MainApplication extends JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    // Generated using JFormDesigner Evaluation license - Milan Herbig
     private JMenuBar jMenuBar1;
-    private JMenu jMenu1;
-    private JMenuItem jMenuItem3;
-    private JMenuItem jMenuItem1;
-    private JMenu jMenu3;
-    private JMenuItem jMenuItem2;
+    private JMenu jMenuFile;
+    private JMenuItem jMenuItemPreferences;
+    private JMenuItem jMenuItemQuit;
+    private JMenu jMenuHelp;
+    private JMenuItem jMenuItemAbout;
     private JPanel jPanelTimer;
     private JButton jButtonStartStop;
     private JTextField jTextFieldMinutes;
