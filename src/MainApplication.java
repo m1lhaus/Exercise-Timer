@@ -2,6 +2,7 @@ import javax.sound.sampled.*;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -10,35 +11,24 @@ import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- * TODO
- *
- * @author Milan Herbig
- */
 public class MainApplication extends JFrame {
 
     private enum CounterMode {
-        ASCENDANT, DESCENDANT
+        INCREASING, DECREASING
     }
 
-    private class Time {
-        int minutes;
-        int seconds;
+    private Timer exTimer;                              // timer for exercise time measurement
+    private Timer globalTimer;                          // timer for global time (clock) measurement
 
-        private Time(int minutes, int seconds) {
-            this.minutes = minutes;
-            this.seconds = seconds;
-        }
-    }
+    private int exTimerTimeSec = 0;                            // exercise time in seconds
+    private int globalTimerTimeSec = 0;                        // global time in seconds
 
-    private Timer exTimer;              // timer for exercise time measurement
+    private final int TIMER_TICK_LENGTH_MSEC = 10;           // timer period (1 second length)
 
-    private final int DELAY = 10;
+    private int exerciseTimeSecPreset = 60;
+    private int numSeriesPreset = 0;
 
-    private int defaultExMinutes = 1;                   // default value number of minutes on timer
-    private int defaultExSeconds = 0;                   // default number of seconds on timer
-    private int defaultNumSeries = 0;
-    private CounterMode seriesCounterMode = CounterMode.ASCENDANT;
+    private CounterMode seriesCounterMode = CounterMode.INCREASING;
 
     /**
      * MainApplication constructor - application entry point
@@ -46,7 +36,13 @@ public class MainApplication extends JFrame {
     private MainApplication() {
         initComponents();
         this.setLocationRelativeTo(null);
-        exTimer = new Timer(DELAY, exTimerTickTock);        // timer for exercise time measurement
+        exTimer = new Timer(TIMER_TICK_LENGTH_MSEC, exTimerTickTock);        // timer for exercise time measurement
+        globalTimer = new Timer(TIMER_TICK_LENGTH_MSEC, globalTimerTickTock);        // timer for global time measurement
+        exTimerTimeSec = exerciseTimeSecPreset;
+        globalTimerTimeSec = 0;
+        resetGlobalClock();
+        jButtonResetGlobalTime.addActionListener(e -> jButtonResetClockClicked(e));
+        jButtonPauseGlobalTime.addActionListener(e -> jButtonPauseResumeClockClicked(e));
     }
 
     /**
@@ -228,91 +224,14 @@ public class MainApplication extends JFrame {
 
                 GroupLayout jPanelPresetLayout = new GroupLayout(jPanelPreset);
                 jPanelPreset.setLayout(jPanelPresetLayout);
-                jPanelPresetLayout.setHorizontalGroup(
-                    jPanelPresetLayout.createParallelGroup()
-                        .addGroup(jPanelPresetLayout.createSequentialGroup()
-                            .addGroup(jPanelPresetLayout.createParallelGroup()
-                                .addComponent(jLabelPresetTitle)
-                                .addGroup(jPanelPresetLayout.createSequentialGroup()
-                                    .addGap(10, 10, 10)
-                                    .addGroup(jPanelPresetLayout.createParallelGroup()
-                                        .addComponent(jRadioButton1min)
-                                        .addComponent(jRadioButton2min)
-                                        .addComponent(jRadioButton3min))
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                    .addGroup(jPanelPresetLayout.createParallelGroup()
-                                        .addComponent(jRadioButton5min)
-                                        .addComponent(jRadioButton10min)
-                                        .addGroup(jPanelPresetLayout.createSequentialGroup()
-                                            .addComponent(jRadioButtonXmin)
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(jTextFieldXmin, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
-                                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(jLabelXmin)))))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jButtonResetTimer)
-                            .addContainerGap())
-                );
-                jPanelPresetLayout.setVerticalGroup(
-                    jPanelPresetLayout.createParallelGroup()
-                        .addGroup(jPanelPresetLayout.createSequentialGroup()
-                            .addGroup(jPanelPresetLayout.createParallelGroup()
-                                .addGroup(jPanelPresetLayout.createSequentialGroup()
-                                    .addComponent(jLabelPresetTitle)
-                                    .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                                    .addGroup(jPanelPresetLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jRadioButton1min)
-                                        .addComponent(jRadioButton5min)))
-                                .addGroup(jPanelPresetLayout.createSequentialGroup()
-                                    .addContainerGap()
-                                    .addComponent(jButtonResetTimer)))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(jPanelPresetLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(jRadioButton2min)
-                                .addComponent(jRadioButton10min))
-                            .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                            .addGroup(jPanelPresetLayout.createParallelGroup()
-                                .addComponent(jRadioButton3min)
-                                .addGroup(jPanelPresetLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jTextFieldXmin, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabelXmin))
-                                .addComponent(jRadioButtonXmin))
-                            .addContainerGap(12, Short.MAX_VALUE))
-                );
+                jPanelPresetLayout.setHorizontalGroup(jPanelPresetLayout.createParallelGroup().addGroup(jPanelPresetLayout.createSequentialGroup().addGroup(jPanelPresetLayout.createParallelGroup().addComponent(jLabelPresetTitle).addGroup(jPanelPresetLayout.createSequentialGroup().addGap(10, 10, 10).addGroup(jPanelPresetLayout.createParallelGroup().addComponent(jRadioButton1min).addComponent(jRadioButton2min).addComponent(jRadioButton3min)).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addGroup(jPanelPresetLayout.createParallelGroup().addComponent(jRadioButton5min).addComponent(jRadioButton10min).addGroup(jPanelPresetLayout.createSequentialGroup().addComponent(jRadioButtonXmin).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(jTextFieldXmin, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(jLabelXmin))))).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(jButtonResetTimer).addContainerGap()));
+                jPanelPresetLayout.setVerticalGroup(jPanelPresetLayout.createParallelGroup().addGroup(jPanelPresetLayout.createSequentialGroup().addGroup(jPanelPresetLayout.createParallelGroup().addGroup(jPanelPresetLayout.createSequentialGroup().addComponent(jLabelPresetTitle).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED).addGroup(jPanelPresetLayout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(jRadioButton1min).addComponent(jRadioButton5min))).addGroup(jPanelPresetLayout.createSequentialGroup().addContainerGap().addComponent(jButtonResetTimer))).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addGroup(jPanelPresetLayout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(jRadioButton2min).addComponent(jRadioButton10min)).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addGroup(jPanelPresetLayout.createParallelGroup().addComponent(jRadioButton3min).addGroup(jPanelPresetLayout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(jTextFieldXmin, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(jLabelXmin)).addComponent(jRadioButtonXmin)).addContainerGap(12, Short.MAX_VALUE)));
             }
 
             GroupLayout jPanelTimerLayout = new GroupLayout(jPanelTimer);
             jPanelTimer.setLayout(jPanelTimerLayout);
-            jPanelTimerLayout.setHorizontalGroup(
-                jPanelTimerLayout.createParallelGroup()
-                    .addGroup(jPanelTimerLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanelTimerLayout.createParallelGroup()
-                            .addGroup(jPanelTimerLayout.createSequentialGroup()
-                                .addGroup(jPanelTimerLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jButtonStartStop, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jPanelPreset, GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE))
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(jPanelTimerLayout.createSequentialGroup()
-                                .addComponent(jTextFieldMinutes, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE)
-                                .addComponent(jLabelColon)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jTextFieldSeconds, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap())
-            );
-            jPanelTimerLayout.setVerticalGroup(
-                jPanelTimerLayout.createParallelGroup()
-                    .addGroup(jPanelTimerLayout.createSequentialGroup()
-                        .addGroup(jPanelTimerLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(jTextFieldMinutes, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jTextFieldSeconds, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabelColon))
-                        .addGap(12, 12, 12)
-                        .addComponent(jButtonStartStop)
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jPanelPreset, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE))
-            );
+            jPanelTimerLayout.setHorizontalGroup(jPanelTimerLayout.createParallelGroup().addGroup(jPanelTimerLayout.createSequentialGroup().addContainerGap().addGroup(jPanelTimerLayout.createParallelGroup().addGroup(jPanelTimerLayout.createSequentialGroup().addGroup(jPanelTimerLayout.createParallelGroup(GroupLayout.Alignment.LEADING, false).addComponent(jButtonStartStop, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(jPanelPreset, GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE)).addGap(0, 0, Short.MAX_VALUE)).addGroup(jPanelTimerLayout.createSequentialGroup().addComponent(jTextFieldMinutes, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 7, Short.MAX_VALUE).addComponent(jLabelColon).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(jTextFieldSeconds, GroupLayout.PREFERRED_SIZE, 96, GroupLayout.PREFERRED_SIZE))).addContainerGap()));
+            jPanelTimerLayout.setVerticalGroup(jPanelTimerLayout.createParallelGroup().addGroup(jPanelTimerLayout.createSequentialGroup().addGroup(jPanelTimerLayout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(jTextFieldMinutes, GroupLayout.PREFERRED_SIZE, 93, GroupLayout.PREFERRED_SIZE).addComponent(jTextFieldSeconds, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(jLabelColon)).addGap(12, 12, 12).addComponent(jButtonStartStop).addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED).addComponent(jPanelPreset, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)));
         }
         contentPane.add(jPanelTimer);
 
@@ -346,43 +265,13 @@ public class MainApplication extends JFrame {
 
             //---- jLabelSeriesCounterMode ----
             jLabelSeriesCounterMode.setFont(new Font("Tahoma", Font.PLAIN, 10));
-            jLabelSeriesCounterMode.setText("Mode: ascendant counting");
+            jLabelSeriesCounterMode.setText("Mode: increasing");
             jLabelSeriesCounterMode.setEnabled(false);
 
             GroupLayout jPanelSeriesLayout = new GroupLayout(jPanelSeries);
             jPanelSeries.setLayout(jPanelSeriesLayout);
-            jPanelSeriesLayout.setHorizontalGroup(
-                jPanelSeriesLayout.createParallelGroup()
-                    .addGroup(jPanelSeriesLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanelSeriesLayout.createParallelGroup()
-                            .addGroup(jPanelSeriesLayout.createSequentialGroup()
-                                .addComponent(jTextFieldSeries, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabelSeries)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE)
-                                .addComponent(jButtonSetSeries, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButtonResetSeries))
-                            .addGroup(jPanelSeriesLayout.createSequentialGroup()
-                                .addComponent(jLabelSeriesCounterMode)
-                                .addGap(0, 110, Short.MAX_VALUE)))
-                        .addContainerGap())
-            );
-            jPanelSeriesLayout.setVerticalGroup(
-                jPanelSeriesLayout.createParallelGroup()
-                    .addGroup(jPanelSeriesLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanelSeriesLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(jButtonSetSeries, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jButtonResetSeries)
-                            .addGroup(jPanelSeriesLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                .addComponent(jTextFieldSeries, GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE)
-                                .addComponent(jLabelSeries)))
-                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jLabelSeriesCounterMode)
-                        .addContainerGap())
-            );
+            jPanelSeriesLayout.setHorizontalGroup(jPanelSeriesLayout.createParallelGroup().addGroup(jPanelSeriesLayout.createSequentialGroup().addContainerGap().addGroup(jPanelSeriesLayout.createParallelGroup().addGroup(jPanelSeriesLayout.createSequentialGroup().addComponent(jTextFieldSeries, GroupLayout.PREFERRED_SIZE, 34, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(jLabelSeries).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 16, Short.MAX_VALUE).addComponent(jButtonSetSeries, GroupLayout.PREFERRED_SIZE, 63, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(jButtonResetSeries)).addGroup(jPanelSeriesLayout.createSequentialGroup().addComponent(jLabelSeriesCounterMode).addGap(0, 110, Short.MAX_VALUE))).addContainerGap()));
+            jPanelSeriesLayout.setVerticalGroup(jPanelSeriesLayout.createParallelGroup().addGroup(jPanelSeriesLayout.createSequentialGroup().addContainerGap().addGroup(jPanelSeriesLayout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(jButtonSetSeries, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(jButtonResetSeries).addGroup(jPanelSeriesLayout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(jTextFieldSeries, GroupLayout.DEFAULT_SIZE, 29, Short.MAX_VALUE).addComponent(jLabelSeries))).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(jLabelSeriesCounterMode).addContainerGap()));
         }
         contentPane.add(jPanelSeries);
 
@@ -417,39 +306,8 @@ public class MainApplication extends JFrame {
 
             GroupLayout jPanelGlobalTimeLayout = new GroupLayout(jPanelGlobalTime);
             jPanelGlobalTime.setLayout(jPanelGlobalTimeLayout);
-            jPanelGlobalTimeLayout.setHorizontalGroup(
-                jPanelGlobalTimeLayout.createParallelGroup()
-                    .addGroup(jPanelGlobalTimeLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jPanelGlobalTimeLayout.createParallelGroup()
-                            .addGroup(jPanelGlobalTimeLayout.createSequentialGroup()
-                                .addComponent(jLabelGlobalTime)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabelGlobalTimeState)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(jPanelGlobalTimeLayout.createSequentialGroup()
-                                .addComponent(jTextFieldGlobalTime, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jLabelHours)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jButtonPauseGlobalTime)
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButtonResetGlobalTime)))
-                        .addContainerGap())
-            );
-            jPanelGlobalTimeLayout.setVerticalGroup(
-                jPanelGlobalTimeLayout.createParallelGroup()
-                    .addGroup(jPanelGlobalTimeLayout.createSequentialGroup()
-                        .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGroup(jPanelGlobalTimeLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                            .addComponent(jTextFieldGlobalTime, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabelHours)
-                            .addComponent(jButtonPauseGlobalTime)
-                            .addComponent(jButtonResetGlobalTime))
-                        .addGroup(jPanelGlobalTimeLayout.createParallelGroup()
-                            .addComponent(jLabelGlobalTimeState)
-                            .addComponent(jLabelGlobalTime)))
-            );
+            jPanelGlobalTimeLayout.setHorizontalGroup(jPanelGlobalTimeLayout.createParallelGroup().addGroup(jPanelGlobalTimeLayout.createSequentialGroup().addContainerGap().addGroup(jPanelGlobalTimeLayout.createParallelGroup().addGroup(jPanelGlobalTimeLayout.createSequentialGroup().addComponent(jLabelGlobalTime).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(jLabelGlobalTimeState).addGap(0, 0, Short.MAX_VALUE)).addGroup(jPanelGlobalTimeLayout.createSequentialGroup().addComponent(jTextFieldGlobalTime, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(jLabelHours).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addComponent(jButtonPauseGlobalTime).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(jButtonResetGlobalTime))).addContainerGap()));
+            jPanelGlobalTimeLayout.setVerticalGroup(jPanelGlobalTimeLayout.createParallelGroup().addGroup(jPanelGlobalTimeLayout.createSequentialGroup().addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE).addGroup(jPanelGlobalTimeLayout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(jTextFieldGlobalTime, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE).addComponent(jLabelHours).addComponent(jButtonPauseGlobalTime).addComponent(jButtonResetGlobalTime)).addGroup(jPanelGlobalTimeLayout.createParallelGroup().addComponent(jLabelGlobalTimeState).addComponent(jLabelGlobalTime))));
         }
         contentPane.add(jPanelGlobalTime);
         pack();
@@ -489,47 +347,8 @@ public class MainApplication extends JFrame {
 
             GroupLayout jFramePreferencesContentPaneLayout = new GroupLayout(jFramePreferencesContentPane);
             jFramePreferencesContentPane.setLayout(jFramePreferencesContentPaneLayout);
-            jFramePreferencesContentPaneLayout.setHorizontalGroup(
-                jFramePreferencesContentPaneLayout.createParallelGroup()
-                    .addGroup(jFramePreferencesContentPaneLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addGroup(jFramePreferencesContentPaneLayout.createParallelGroup()
-                            .addComponent(jLabelPreferencesHeading)
-                            .addComponent(jLabelPreferencesDesc)
-                            .addGroup(jFramePreferencesContentPaneLayout.createSequentialGroup()
-                                .addComponent(jRadioButtonAsc)
-                                .addGroup(jFramePreferencesContentPaneLayout.createParallelGroup()
-                                    .addGroup(jFramePreferencesContentPaneLayout.createSequentialGroup()
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 63, Short.MAX_VALUE)
-                                        .addComponent(jButtonSavePreferences, GroupLayout.PREFERRED_SIZE, 65, GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(jButtonStornoPreferences))
-                                    .addGroup(jFramePreferencesContentPaneLayout.createSequentialGroup()
-                                        .addGap(20, 20, 20)
-                                        .addComponent(jRadioButtonDesc)))))
-                        .addContainerGap())
-            );
-            jFramePreferencesContentPaneLayout.setVerticalGroup(
-                jFramePreferencesContentPaneLayout.createParallelGroup()
-                    .addGroup(jFramePreferencesContentPaneLayout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabelPreferencesHeading)
-                        .addGap(1, 1, 1)
-                        .addComponent(jLabelPreferencesDesc)
-                        .addGroup(jFramePreferencesContentPaneLayout.createParallelGroup()
-                            .addGroup(jFramePreferencesContentPaneLayout.createSequentialGroup()
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(jFramePreferencesContentPaneLayout.createParallelGroup()
-                                    .addComponent(jRadioButtonAsc)
-                                    .addComponent(jRadioButtonDesc))
-                                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                            .addGroup(GroupLayout.Alignment.TRAILING, jFramePreferencesContentPaneLayout.createSequentialGroup()
-                                .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE)
-                                .addGroup(jFramePreferencesContentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jButtonStornoPreferences)
-                                    .addComponent(jButtonSavePreferences))
-                                .addContainerGap())))
-            );
+            jFramePreferencesContentPaneLayout.setHorizontalGroup(jFramePreferencesContentPaneLayout.createParallelGroup().addGroup(jFramePreferencesContentPaneLayout.createSequentialGroup().addContainerGap().addGroup(jFramePreferencesContentPaneLayout.createParallelGroup().addComponent(jLabelPreferencesHeading).addComponent(jLabelPreferencesDesc).addGroup(jFramePreferencesContentPaneLayout.createSequentialGroup().addComponent(jRadioButtonAsc).addGroup(jFramePreferencesContentPaneLayout.createParallelGroup().addGroup(jFramePreferencesContentPaneLayout.createSequentialGroup().addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 63, Short.MAX_VALUE).addComponent(jButtonSavePreferences, GroupLayout.PREFERRED_SIZE, 65, GroupLayout.PREFERRED_SIZE).addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addComponent(jButtonStornoPreferences)).addGroup(jFramePreferencesContentPaneLayout.createSequentialGroup().addGap(20, 20, 20).addComponent(jRadioButtonDesc))))).addContainerGap()));
+            jFramePreferencesContentPaneLayout.setVerticalGroup(jFramePreferencesContentPaneLayout.createParallelGroup().addGroup(jFramePreferencesContentPaneLayout.createSequentialGroup().addContainerGap().addComponent(jLabelPreferencesHeading).addGap(1, 1, 1).addComponent(jLabelPreferencesDesc).addGroup(jFramePreferencesContentPaneLayout.createParallelGroup().addGroup(jFramePreferencesContentPaneLayout.createSequentialGroup().addPreferredGap(LayoutStyle.ComponentPlacement.RELATED).addGroup(jFramePreferencesContentPaneLayout.createParallelGroup().addComponent(jRadioButtonAsc).addComponent(jRadioButtonDesc)).addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)).addGroup(GroupLayout.Alignment.TRAILING, jFramePreferencesContentPaneLayout.createSequentialGroup().addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 37, Short.MAX_VALUE).addGroup(jFramePreferencesContentPaneLayout.createParallelGroup(GroupLayout.Alignment.BASELINE).addComponent(jButtonStornoPreferences).addComponent(jButtonSavePreferences)).addContainerGap()))));
         }
 
         //---- buttonGroup1 ----
@@ -547,24 +366,25 @@ public class MainApplication extends JFrame {
         buttonGroup2.add(jRadioButtonDesc);
     }// </editor-fold>//GEN-END:initComponents
 
-
     /**
      * ExTimer worker called on timer-tick
      */
     private ActionListener exTimerTickTock = evt -> {
-        Time time = getExerciseTime();
-        time.seconds--;                // minus one second
-        if (time.seconds < 0) {
-            time.minutes--;
-            time.seconds = 59;
-        }
+        exTimerTimeSec -= 1;
 
-        // time has ran out ?
-        if ((time.seconds == 0) && (time.minutes == 0)) {
+        if (exTimerTimeSec <= 0) {
             exerciseTimeRanOut();
         } else {
-            setExerciseTime(time);
+            setExerciseTime(exTimerTimeSec);
         }
+    };
+
+    /**
+     * GlobalTimer callback called on timer-tick
+     */
+    private ActionListener globalTimerTickTock = evt -> {
+        globalTimerTimeSec += 1;
+        setGlobalClock(globalTimerTimeSec);
     };
 
     /**
@@ -573,13 +393,14 @@ public class MainApplication extends JFrame {
      */
     private void exerciseTimeRanOut() {
         exTimer.stop();
-        adjustGUI(true);
+        exTimerTimeSec = exerciseTimeSecPreset;
+        adjustExerciseGUIElements(true);
         playSound("alarm2.wav");
-        resetExerciseTime();
+        setExerciseTime(exerciseTimeSecPreset);
 
         // increase or decrease series counter
         int numSeries = getNumberOfSeries();
-        if (seriesCounterMode == CounterMode.DESCENDANT) {
+        if (seriesCounterMode == CounterMode.DECREASING) {
             if (numSeries != 0) {
                 numSeries--;
             } else {
@@ -590,7 +411,6 @@ public class MainApplication extends JFrame {
         }
         setNumberOfSeries(numSeries);
     }
-
 
     /**
      * Sets number of series to GUI text field
@@ -606,40 +426,30 @@ public class MainApplication extends JFrame {
         return Integer.parseInt(jTextFieldSeries.getText());
     }
 
-
     /**
      * Sets minutes and seconds to exercise time text fields
      */
-    private void setExerciseTime(int minutes, int seconds) {
+    private void setExerciseTime(int timeSec) {
+        exTimerTimeSec = timeSec;
+        int minutes = timeSec / 60;
+        int seconds = timeSec - (minutes * 60);
         jTextFieldMinutes.setText(String.format("%02d", minutes));
         jTextFieldSeconds.setText(String.format("%02d", seconds));
     }
 
     /**
-     * Sets minutes and seconds to exercise time text fields
+     * Set global clock value to GUI element.
      */
-    private void setExerciseTime(Time time) {
-        jTextFieldMinutes.setText(String.format("%02d", time.minutes));
-        jTextFieldSeconds.setText(String.format("%02d", time.seconds));
+    private void setGlobalClock(int timeSec) {
+        int hours = timeSec / (60 * 60);
+        int minutes = (timeSec - (hours * 60 * 60)) / 60;
+        jTextFieldGlobalTime.setText(String.format("%02d", hours) + ":" + String.format("%02d", minutes));
     }
-
-    /**
-     * Gets current exercise time from minutes and seconds text field
-     */
-    private Time getExerciseTime() {
-        return new Time(Integer.parseInt(jTextFieldMinutes.getText()), Integer.parseInt(jTextFieldSeconds.getText()));
-    }
-
-
-    private void resetExerciseTime() {
-        setExerciseTime(defaultExMinutes, defaultExSeconds);
-    }
-
 
     /**
      * Depending on if exercise timer is running this methods enables/disables GUI elements
      */
-    private void adjustGUI(boolean timerIsStopped) {
+    private void adjustExerciseGUIElements(boolean timerIsStopped) {
         jButtonStartStop.setText(timerIsStopped ? "START" : "STOP");
         jButtonResetTimer.setEnabled(timerIsStopped);
         jRadioButton1min.setEnabled(timerIsStopped);
@@ -652,38 +462,54 @@ public class MainApplication extends JFrame {
         jLabelXmin.setEnabled(timerIsStopped);
     }
 
+    private void startGlobalClock() {
+        jLabelGlobalTimeState.setText("running");
+        jButtonPauseGlobalTime.setEnabled(true);
+        jButtonResetGlobalTime.setEnabled(true);
+    }
+
+    private void resetGlobalClock() {
+        jLabelGlobalTimeState.setText("not running");
+        jButtonPauseGlobalTime.setEnabled(false);
+        jButtonResetGlobalTime.setEnabled(false);
+        jTextFieldGlobalTime.setText("00:00");
+    }
+
     private void startExerciseTimer() {
         exTimer.start();
-        adjustGUI(!exTimer.isRunning());
+        adjustExerciseGUIElements(false);
+        if (!globalTimer.isRunning()) {
+            globalTimer.start();
+            startGlobalClock();
+        }
     }
 
     private void stopExerciseTimer() {
         exTimer.stop();
-        adjustGUI(!exTimer.isRunning());
+        adjustExerciseGUIElements(true);
     }
 
     private void saveSettings() {
         // set selected mode
         if (jRadioButtonAsc.isSelected()) {
-            seriesCounterMode = CounterMode.ASCENDANT;
-            defaultNumSeries = 0;
+            seriesCounterMode = CounterMode.INCREASING;
+            numSeriesPreset = 0;
         } else {
-            seriesCounterMode = CounterMode.DESCENDANT;
+            seriesCounterMode = CounterMode.DECREASING;
         }
         // adjust GUI according to selected mode
-        if (seriesCounterMode == CounterMode.ASCENDANT) {
+        if (seriesCounterMode == CounterMode.INCREASING) {
             jTextFieldSeries.setEditable(false);
             jButtonSetSeries.setEnabled(false);
-            jLabelSeriesCounterMode.setText("Mode: ascendant counting.");
+            jLabelSeriesCounterMode.setText("Mode: increasing.");
         } else {
             jTextFieldSeries.setEditable(true);
             jButtonSetSeries.setEnabled(true);
             jButtonStartStop.setEnabled(false);
-            jLabelSeriesCounterMode.setText("Mode: descendant counting");
+            jLabelSeriesCounterMode.setText("Mode: descreasing");
         }
         jFramePreferences.dispose();      // close dialog
     }
-
 
     /**
      * Play alarm sound after exercise timer time runs-off
@@ -702,8 +528,25 @@ public class MainApplication extends JFrame {
         }
     }
 
-/* ********************* event handlers ******************************** */
+    /* ********************* event handlers ******************************** */
 
+    private void jButtonResetClockClicked(ActionEvent e) {
+        globalTimer.stop();
+        globalTimerTimeSec = 0;
+        resetGlobalClock();
+    }
+
+    private void jButtonPauseResumeClockClicked(ActionEvent e) {
+        if (globalTimer.isRunning()) {
+            globalTimer.stop();
+            jButtonPauseGlobalTime.setText("Resume");
+            jLabelGlobalTimeState.setText("paused");
+        } else {
+            globalTimer.start();
+            jButtonPauseGlobalTime.setText("Pause");
+            jLabelGlobalTimeState.setText("running");
+        }
+    }
 
     private void jButtonStartStopClicked(java.awt.event.ActionEvent evt) {
         if ((exTimer == null) || (!exTimer.isRunning())) {
@@ -714,32 +557,32 @@ public class MainApplication extends JFrame {
     }
 
     private void jRadioButton1minActionPerformed(java.awt.event.ActionEvent evt) {
-        defaultExMinutes = 1;
-        setExerciseTime(defaultExMinutes, defaultExSeconds);
+        exerciseTimeSecPreset = 1 * 60;
+        setExerciseTime(exerciseTimeSecPreset);
         jTextFieldXmin.setEditable(false);
     }
 
     private void jRadioButton2minActionPerformed(java.awt.event.ActionEvent evt) {
-        defaultExMinutes = 2;
-        setExerciseTime(defaultExMinutes, defaultExSeconds);
+        exerciseTimeSecPreset = 2 * 60;
+        setExerciseTime(exerciseTimeSecPreset);
         jTextFieldXmin.setEditable(false);
     }
 
     private void jRadioButton3minActionPerformed(java.awt.event.ActionEvent evt) {
-        defaultExMinutes = 3;
-        setExerciseTime(defaultExMinutes, defaultExSeconds);
+        exerciseTimeSecPreset = 3 * 60;
+        setExerciseTime(exerciseTimeSecPreset);
         jTextFieldXmin.setEditable(false);
     }
 
     private void jRadioButton5minActionPerformed(java.awt.event.ActionEvent evt) {
-        defaultExMinutes = 5;
-        setExerciseTime(defaultExMinutes, defaultExSeconds);
+        exerciseTimeSecPreset = 5 * 60;
+        setExerciseTime(exerciseTimeSecPreset);
         jTextFieldXmin.setEditable(false);
     }
 
     private void jRadioButton10minActionPerformed(java.awt.event.ActionEvent evt) {
-        defaultExMinutes = 10;
-        setExerciseTime(defaultExMinutes, defaultExSeconds);
+        exerciseTimeSecPreset = 10 * 60;
+        setExerciseTime(exerciseTimeSecPreset);
         jTextFieldXmin.setEditable(false);
     }
 
@@ -753,19 +596,22 @@ public class MainApplication extends JFrame {
     private void jTextFieldXminKeyReleased(java.awt.event.KeyEvent evt) {
         // if some character is filled
         if (!(jTextFieldXmin.getText().equals(""))) {
-            // parse number
+            int minutes = 0;
             try {
-                defaultExMinutes = Integer.parseInt(jTextFieldXmin.getText());
+                minutes = Integer.parseInt(jTextFieldXmin.getText());
             } catch (NumberFormatException e) {
                 jTextFieldXmin.setText("");
                 return;
             }
             // check bounds
-            if (defaultExMinutes > 99) {
-                jTextFieldXmin.setText("0");
-                defaultExMinutes = 0;
+            if (minutes > 99) {
+                minutes = 99;
+            } else if (minutes < 0) {
+                minutes = 0;
             }
-            setExerciseTime(defaultExMinutes, defaultExSeconds);
+            jTextFieldXmin.setText(String.valueOf(minutes));
+            exerciseTimeSecPreset = minutes * 60;
+            setExerciseTime(exerciseTimeSecPreset);
         }
     }
 
@@ -773,7 +619,7 @@ public class MainApplication extends JFrame {
      * Timer reset button
      */
     private void jButtonResetTimerActionPerformed(java.awt.event.ActionEvent evt) {
-        resetExerciseTime();
+        setExerciseTime(exerciseTimeSecPreset);
     }
 
     /**
@@ -806,14 +652,13 @@ public class MainApplication extends JFrame {
     }
 
     /**
-     * Set user-given number of series.
+     * User set number of series by clicking Set button.
      */
     private void jButtonSetSeriesActionPerformed(java.awt.event.ActionEvent evt) {
         int newValue;
         try {
             newValue = Integer.parseInt(jTextFieldSeries.getText());
-            if (newValue <= 0)
-                throw new NumberFormatException();
+            if (newValue <= 0) throw new NumberFormatException();
 
         } catch (NumberFormatException e) {
             final String originalTest = jLabelSeriesCounterMode.getText();
@@ -834,12 +679,15 @@ public class MainApplication extends JFrame {
             return;
         }
         setNumberOfSeries(newValue);
-        defaultNumSeries = newValue;
+        numSeriesPreset = newValue;
         jButtonStartStop.setEnabled(true);
     }
 
+    /**
+     * User clicked on Reset series button.
+     */
     private void jButtonResetSeriesActionPerformed(java.awt.event.ActionEvent evt) {
-        setNumberOfSeries(defaultNumSeries);
+        setNumberOfSeries(numSeriesPreset);
     }
 
     /**
