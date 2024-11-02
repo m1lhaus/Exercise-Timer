@@ -25,7 +25,7 @@ public class MainApplication extends JFrame {
     private int exTimerTimeSec = 0;                            // exercise time in seconds
     private int globalTimerTimeSec = 0;                        // global time in seconds
 
-    private final int TIMER_TICK_LENGTH_MSEC = 10;           // timer period (1 second length)
+    private final int TIMER_TICK_LENGTH_MSEC = 1000;           // timer period (1 second length)
 
     private int exerciseTimeSecPreset = 60;
     private int numSeriesPreset = 0;
