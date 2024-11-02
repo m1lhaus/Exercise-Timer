@@ -6,8 +6,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -518,13 +520,23 @@ public class MainApplication extends JFrame {
      */
     private void playSound(String filename) {
         try {
-            File soundFile = new File("." + File.separator + "data" + File.separator + filename);
-            AudioInputStream audioIn = AudioSystem.getAudioInputStream(soundFile);
+            // Get resource as stream
+            InputStream audioStream = getClass().getResourceAsStream("/" + filename);
+            if (audioStream == null) {
+                audioStream = getClass().getResourceAsStream("/data/" + filename);
+                if (audioStream == null) {
+                    throw new RuntimeException("Could not find audio file: " + filename);
+                }
+            }
+            // Wrap the InputStream with BufferedInputStream to support mark/reset
+            BufferedInputStream bufferedIn = new BufferedInputStream(audioStream);
+            AudioInputStream audioIn = AudioSystem.getAudioInputStream(bufferedIn);
             Clip clip = AudioSystem.getClip();
             clip.open(audioIn);
             clip.start();
         } catch (UnsupportedAudioFileException | IOException | LineUnavailableException e) {
             System.out.println("Error when playing media file!");
+            System.out.println(e.toString());
         }
     }
 
